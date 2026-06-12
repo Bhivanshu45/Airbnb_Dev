@@ -1,6 +1,6 @@
 require("ts-node/register");
 
-const config = require("./config").default
+const config = require("./db.config").default
 
 
 module.exports = config;
