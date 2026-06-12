@@ -27,3 +27,9 @@ export async function getHotelById(id:number){
     logger.info(`Hotel with id ${id} retrieved successfully.`);
     return hotel;
 }
+
+export async function getAllHotels(){
+    const hotels = await Hotel.findAll();
+    logger.info(`All hotels retrieved successfully. Total count: ${hotels.length}`);
+    return hotels;
+}

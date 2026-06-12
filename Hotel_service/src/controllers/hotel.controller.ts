@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { createHotelService, getHotelByIdService } from '../services/hotel.service';
+import { createHotelService, getAllHotelsService, getHotelByIdService } from '../services/hotel.service';
 
 export async function createHotelHandler(req: Request, res: Response, next: NextFunction) {
     // 1. call theservice layer
@@ -19,5 +19,14 @@ export async function getHotelByIdHandler(req: Request, res: Response, next: Nex
         success: true,
         message: 'Hotel retrieved successfully',
         data: hotelResponse
+    });
+}
+
+export async function getAllHotelsHandler(req: Request, res: Response, next: NextFunction) {
+    const hotels = await getAllHotelsService();
+    res.status(200).json({
+        success: true,
+        message: 'Hotels retrieved successfully',
+        data: hotels
     });
 }
