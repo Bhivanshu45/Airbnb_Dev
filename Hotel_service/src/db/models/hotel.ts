@@ -6,8 +6,8 @@ class Hotel extends Model <InferAttributes<Hotel>, InferCreationAttributes<Hotel
     declare name: string;
     declare address: string;
     declare location: string;
-    declare rating: number;
-    declare rating_count: number;
+    declare rating?: number;
+    declare ratingCount?: number;
     declare createdAt: CreationOptional<Date>;
     declare updatedAt: CreationOptional<Date>;
 
@@ -35,7 +35,7 @@ Hotel.init({
         type: 'FLOAT',
         defaultValue: null
     },
-    rating_count: {
+    ratingCount: {
         type: 'INTEGER',
         defaultValue: null
     },
