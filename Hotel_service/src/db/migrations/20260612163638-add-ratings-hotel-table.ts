@@ -13,6 +13,7 @@ module.exports = {
     await queryInterface.sequelize.query(`
       ALTER TABLE hotels
       DROP COLUMN rating,
+      DROP COLUMN rating,
       DROP COLUMN rating_count;
       `);
   }
