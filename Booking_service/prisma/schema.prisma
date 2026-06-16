@@ -1,0 +1,37 @@
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Booking {
+  id                Int           @id @default(autoincrement())
+  userId            Int
+  hotelId           Int
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  bookingAmount     Int
+  status            BookingStatus @default(PENDING)
+  totalGuests       Int
+  idempotencyKey    IdempotencyKey?
+}
+
+model IdempotencyKey {
+  id         Int      @id @default(autoincrement())
+  idemKey    String   @unique // uuid 
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  finalized  Boolean  @default(false)
+  bookingId  Int      @unique
+  booking    Booking? @relation(fields: [bookingId], references: [id])
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+}
