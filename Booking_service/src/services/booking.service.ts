@@ -1,17 +1,15 @@
 import { confirmBooking, createBooking, createIdempotencyKey, finalizeIdempotencyKey, getIdempotencyKey } from "../repositories/booking.repository";
+import { CreateBookingDTO } from "../dto/booking.dto";
 import { generateIdempotencyKey } from "../utils/generateIdempotencyKey";
 
 export async function createBookingService(
-    userId:number, 
-    hotelId:number,
-    totalGuests: number,
-    bookingAmount: number
+    createBookingDTO: CreateBookingDTO
 ){
     const booking = await createBooking({
-        userId,
-        hotelId,
-        totalGuests,
-        bookingAmount
+        userId: createBookingDTO.userId,
+        hotelId: createBookingDTO.hotelId,
+        totalGuests: createBookingDTO.totalGuests,
+        bookingAmount: createBookingDTO.bookingAmount
     })
 
     const idempotencyKey = generateIdempotencyKey();
