@@ -5,6 +5,8 @@ import v2Router from './routers/v2/index.router';
 import { appErrorHandler, genericErrorHandler } from './middlewares/error.middleware';
 import logger from './config/logger.config';
 import { attachCorrelationIdMiddleware } from './middlewares/correlation.middleware';
+import { addEmailToQueue } from './producers/email.producer';
+import { NotificationDTO } from './dto/notification.dto';
 const app = express();
 
 app.use(express.json());
@@ -29,4 +31,13 @@ app.use(genericErrorHandler);
 app.listen(serverConfig.PORT, () => {
     logger.info(`Server is running on http://localhost:${serverConfig.PORT}`);
     logger.info(`Press Ctrl+C to stop the server.`);
+
+    const sampleNotification: NotificationDTO = {
+        to: "user@example.com",
+        subject: "Sample Email",
+        templateId: "template_123",
+        params: { name: "John Doe",orderid:"123456" }
+    };
+
+    addEmailToQueue(sampleNotification)
 });
