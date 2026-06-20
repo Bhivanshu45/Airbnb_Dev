@@ -33,10 +33,10 @@ app.listen(serverConfig.PORT, () => {
     logger.info(`Press Ctrl+C to stop the server.`);
 
     const sampleNotification: NotificationDTO = {
-        to: "user@example.com",
-        subject: "Sample Email",
-        templateId: "template_123",
-        params: { name: "John Doe",orderid:"123456" }
+        to: "bhivanshulawaniya6@gmail.com",
+        subject: "welcome to our service",
+        templateId: "welcome",
+        params: { name: "Er-Saniya Sharma",orderid:"123456" }
     };
 
     addEmailToQueue(sampleNotification)

@@ -6,6 +6,7 @@ import { appErrorHandler, genericErrorHandler } from './middlewares/error.middle
 import logger from './config/logger.config';
 import { attachCorrelationIdMiddleware } from './middlewares/correlation.middleware';
 import { setupMailerWorker } from './processors/email.processor';
+// import { renderMailTemplate } from './template/templates.handler';
 // import { NotificationDTO } from './dto/notification.dto';
 // import { addEmailToQueue } from './producers/email.producer';
 const app = express();
@@ -29,19 +30,14 @@ app.use(appErrorHandler);
 app.use(genericErrorHandler);
 
 
-app.listen(serverConfig.PORT, () => {
+app.listen(serverConfig.PORT, async () => {
     logger.info(`Server is running on http://localhost:${serverConfig.PORT}`);
     logger.info(`Press Ctrl+C to stop the server.`);
 
     setupMailerWorker();
     logger.info(`Mailer worker is set up and running.`);
 
-    // const sampleNotification: NotificationDTO = {
-    //     to: "user@example.com",
-    //     subject: "Sample Email",
-    //     templateId: "template_123",
-    //     params: { name: "John Doe" }
-    // };
-
-    // addEmailToQueue(sampleNotification)
+    // const response = await renderMailTemplate("welcome", { name: "John Doe", orderid: "123456" });
+    // console.log(response);
+    // logger.info(`Rendered email content: ${response}`);
 });
