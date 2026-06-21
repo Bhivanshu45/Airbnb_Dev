@@ -36,7 +36,7 @@ app.listen(serverConfig.PORT, () => {
         to: "bhivanshulawaniya6@gmail.com",
         subject: "welcome to our service",
         templateId: "welcome",
-        params: { name: "Er-Saniya Sharma",orderid:"123456" }
+        params: { name: "Er-Bhivanshu",orderid:"555" }
     };
 
     addEmailToQueue(sampleNotification)

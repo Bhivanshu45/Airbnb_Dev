@@ -9,6 +9,7 @@ export const setupMailerWorker = () => {
   const emailProcessor = new Worker<NotificationDTO>(
     MAILER_QUEUE,
     async (job: Job) => {
+      console.log("JOB RECEIVED", job.id);
       if (job.name != MAILER_PAYLOAD) {
         throw new Error("Invalid job type");
       }
@@ -23,6 +24,14 @@ export const setupMailerWorker = () => {
       connection: redisClient() as any,
     },
   );
+
+  emailProcessor.on("ready", () => {
+    console.log("Worker is ready");
+  });
+
+  emailProcessor.on("error", (err) => {
+    console.error("Worker error:", err);
+  });
 
   emailProcessor.on("failed", () => {
     console.error("Email processing failed");
