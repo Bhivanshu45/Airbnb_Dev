@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { getProfileService, registerService } from '../services/user.service';
+import { getProfileService, logoutService, refreshTokenService, registerService } from '../services/user.service';
 import logger from '../config/logger.config';
 import { loginUserService } from '../services/user.service';
 
@@ -9,7 +9,6 @@ export const registerHandler = async (req: Request, res: Response) => {
         const createdUser = await registerService(req.body);
         logger.info(`User registered successfully: ${createdUser.email}`);
         res.status(201).json({ success: true, message: 'User registered successfully', user: createdUser });
-
         
 
     }catch(err){
@@ -29,6 +28,35 @@ export const loginUserHandler = async (req: Request, res: Response) => {
     }
 };
 
+export const refreshTokenHandler = async (
+    req: Request,
+    res: Response
+) => {
+
+    try {
+
+        const token = await refreshTokenService(req.body);
+
+        res.status(200).json({
+            success: true,
+            message: "Access token refreshed successfully",
+            data: token
+        });
+
+    } catch (err) {
+
+        logger.error("Error in refreshTokenHandler", err);
+
+        res.status(500).json({
+            success: false,
+            message: "Failed to refresh access token",
+            error: err
+        });
+
+    }
+
+}
+
 export const profileHandler = async (req: any, res: Response) => {
     try {
         const profileDetails = await getProfileService({id: req.user.id });
@@ -39,3 +67,37 @@ export const profileHandler = async (req: any, res: Response) => {
         res.status(500).json({ success: false, message: 'Fetching profile details failed', error: err });
     }
 };
+
+export const logoutHandler = async (
+    req: Request,
+    res: Response
+) => {
+
+    try {
+
+        const response =
+            await logoutService(req.body);
+
+        logger.info("User logged out successfully");
+
+        res.status(200).json({
+            success: true,
+            message: response.message
+        });
+
+    } catch (err) {
+
+        logger.error(
+            "Error in logoutHandler",
+            err
+        );
+
+        res.status(500).json({
+            success: false,
+            message: "Logout failed",
+            error: err
+        });
+
+    }
+
+}

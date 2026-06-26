@@ -3,8 +3,10 @@ import logger from "../config/logger.config";
 import { prisma } from "../config/prisma.config";
 import bcrypt from "bcrypt";
 import { BadRequestError } from "../utils/errors/app.error";
-import { LoginDto } from "../dto/login.dto";
+import { LoginDto, LogoutDto, RefreshTokenDto } from "../dto/login.dto";
 import { generateAccessToken, generateRefreshToken } from "../utils/helpers/jwt.util";
+import jwt from "jsonwebtoken";
+import { serverConfig } from "../config/index";
 
 export const userCreation = async (payload: SignupDto) => {
   try {
@@ -113,6 +115,63 @@ export const loginUser = async (payload: LoginDto) => {
   }
 };
 
+export const refreshAccessToken = async (
+    payload: RefreshTokenDto
+) => {
+
+    const { refreshToken } = payload;
+
+    // Verify JWT
+    const decoded = jwt.verify(
+        refreshToken,
+        serverConfig.REFRESH_TOKEN_SECRET
+    ) as { id: string };
+
+    // Check token exists in DB
+    const storedToken = await prisma.refreshToken.findUnique({
+        where: {
+            token: refreshToken
+        }
+    });
+
+    if (!storedToken) {
+        throw new BadRequestError("Invalid refresh token");
+    }
+
+    // Check expiry
+    if (storedToken.expiresAt < new Date()) {
+
+        await prisma.refreshToken.delete({
+            where: {
+                token: refreshToken
+            }
+        });
+
+        throw new BadRequestError("Refresh token expired");
+    }
+
+    // Fetch user
+    const user = await prisma.user.findUnique({
+        where: {
+            id: decoded.id
+        }
+    });
+
+    if (!user) {
+        throw new BadRequestError("User not found");
+    }
+
+    const accessToken = generateAccessToken({
+        id: user.id,
+        email: user.email,
+        role: user.role
+    });
+
+    return {
+        accessToken
+    };
+}
+
 export const fetchUserProfile = async (payload: { id: string }) => {
   try {
     const user = await prisma.user.findUnique({
@@ -138,4 +197,41 @@ export const fetchUserProfile = async (payload: { id: string }) => {
     logger.error("Error in fetchUserProfile function", err);
     throw err;
   }
+}
+
+export const logoutUser = async (
+    payload: LogoutDto
+) => {
+
+    const { refreshToken } = payload;
+
+    // Verify refresh token
+    jwt.verify(
+        refreshToken,
+        serverConfig.REFRESH_TOKEN_SECRET
+    );
+
+    // Check if token exists
+    const storedToken = await prisma.refreshToken.findUnique({
+        where: {
+            token: refreshToken
+        }
+    });
+
+    if (!storedToken) {
+        throw new BadRequestError(
+            "Refresh token not found"
+        );
+    }
+
+    // Delete token
+    await prisma.refreshToken.delete({
+        where: {
+            token: refreshToken
+        }
+    });
+
+    return {
+        message: "Logged out successfully"
+    };
 }
